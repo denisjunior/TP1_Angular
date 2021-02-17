@@ -8,6 +8,9 @@ app.get('/', async (req, res) => {
   return getData();
 });
 
+//getting the catFact
+
+
 // Run the server!
 const start = async () => {
   try {
@@ -18,58 +21,60 @@ const start = async () => {
   }
 };
 
-//get a cat fact
+// Get cat facts
 const getCatFact = (base) => {
   return new Promise(resolve => {
-    axios.get(`https://cat-fact.herokuapp.com/facts/random?animal_type=cat&base=`+ base).then(response => {
-      const data = response.data;
+    axios.get(`https://cat-fact.herokuapp.com/facts/random?animal_type=cat&amount=${base}`).then(res => {
+      const data = res.data;
       let tab = [];
-      for (let i =0; i<data.length; i++){
+      for (let i = 0; i < data.length; i++) {
         tab.push(data[i].text);
       }
       resolve(tab);
-    }).catch(error =>{
+    }).catch(err => {
       resolve(null);
     })
   });
 };
-// get a fox image
-const getFox = () => {
+
+// Get fox image
+const getFoxImage = () => {
   return new Promise(resolve => {
-    axios.get(`https://randomfox.ca/floof/`).then(response => {
-      const data = response.data;
+    axios.get(`https://randomfox.ca/floof/`).then(res => {
+      const data = res.data;
       resolve(data.image);
-    }).catch(error => {
+    }).catch(err => {
       resolve(null);
     })
   });
 };
 
-// get country day off
-const getDay = (country) =>{
+// Get days off by country code
+const getDay = (country) => {
   return new Promise(resolve => {
-    axios.get(`https://date.nager.at/api/v2/PublicHolidays/2021/` + country).then(response => {
-      const data = response.data;
+    axios.get(`https://date.nager.at/api/v2/PublicHolidays/2021/${country}`).then(res => {
+      const data = res.data;
       resolve(data);
-    }).catch(error => {
+    }).catch(err => {
       resolve(null);
     })
   });
 };
 
-//
+// Get all API
 const getData = () => {
-  const cat = getCatFact(3);
-  const foxImage= getFox();
+  const catFact = getCatFact(2);
+  const fox = getFoxImage();
   const day = getDay('FR');
 
-  return Promise.all([cat, foxImage, day]).then((values) => {
-    let val = {}
-    val['catFacts'] = values[0];
-    val['foxPicture']= values[1];
-    val['holidays']= values[2];
+  return Promise.all([catFact, fox, day]).then((values) => {
+    let val = {};
+
+    val['catFact'] = values[0];
+    val['foxPicture'] = values[1];
+    val['holidays'] = values[2];
     return val;
-  })
-}
+  });
+};
 
 start();
